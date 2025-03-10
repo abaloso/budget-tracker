@@ -24,14 +24,7 @@ export default function LogoutPage() {
         <div className="max-w-lg mx-auto w-full flex flex-col items-center justify-center">
           <div className="text-center mb-7">
             <Link href="/">
-              <Image
-                src="/assets/images/full-logo.svg"
-                alt="Logo"
-                width={150}
-                height={50}
-                priority
-                className="mb-8"
-              />
+        <Image src="/assets/images/full-logo-light.svg" alt="BudGo Logo" width={200} height={80} priority className="mb-6" />
             </Link>
             <div>
               <h3 className="text-2xl font-semibold text-dark mb-3">See you again!</h3>

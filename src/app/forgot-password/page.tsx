@@ -9,9 +9,9 @@ import Image from "next/image";
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState<string>("");
   const [message, setMessage] = useState<string>("");
-  const router = useRouter();
-
-  const handleSubmit = async (e: FormEvent) => {
+  // router is not used so it's removed.
+  
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
       await sendPasswordResetEmail(auth, email);
@@ -28,7 +28,7 @@ export default function ForgotPasswordPage() {
         <div className="max-w-lg mx-auto w-full flex flex-col justify-center items-center p-6">
           <div className="text-center mb-7">
             <Link href="/">
-              <Image src="/assets/images/full-logo.svg" alt="Logo" width={150} height={50} priority className="mb-8" />
+        <Image src="/assets/images/full-logo-light.svg" alt="BudGo Logo" width={200} height={80} priority className="mb-6" />
             </Link>
             <div>
               <h3 className="text-2xl font-semibold text-dark mb-3">Forgot Your Password?</h3>
@@ -39,7 +39,9 @@ export default function ForgotPasswordPage() {
           </div>
           <form className="w-full" onSubmit={handleSubmit}>
             <div className="mb-4">
-              <label htmlFor="email" className="block text-base font-semibold text-dark mb-2">Email address</label>
+              <label htmlFor="email" className="block text-base font-semibold text-dark mb-2">
+                Email address
+              </label>
               <input
                 id="email"
                 type="email"

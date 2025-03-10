@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { auth } from "@/app/firebaseConfig";
 import { updatePassword } from "firebase/auth";
 import { Eye, EyeOff } from "lucide-react";
+import Link from "next/link";
 import Image from "next/image";
 
 export default function ResetPasswordPage() {
@@ -17,7 +18,7 @@ export default function ResetPasswordPage() {
     setShowPassword((prev) => !prev);
   };
 
-  const handleSubmit = async (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (newPassword !== confirmPassword) {
       setMessage("Passwords do not match");
@@ -42,9 +43,9 @@ export default function ResetPasswordPage() {
         {/* Left Side: Form */}
         <div className="max-w-lg mx-auto w-full flex flex-col justify-center items-center p-6">
           <div className="text-center mb-7">
-            <a href="/" className="block mb-8">
-              <Image src="/assets/images/full-logo.svg" alt="Logo" width={150} height={50} priority className="mb-6" />
-            </a>
+            <Link href="/">
+        <Image src="/assets/images/full-logo-light.svg" alt="BudGo Logo" width={200} height={80} priority className="mb-6" />
+            </Link>
             <div>
               <h3 className="text-2xl font-semibold text-dark mb-3">Change Your Password</h3>
               <p className="text-base font-medium text-light">
