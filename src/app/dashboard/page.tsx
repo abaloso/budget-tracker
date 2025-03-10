@@ -4,7 +4,6 @@ import { useRouter } from "next/navigation";
 import { auth } from "@/app/firebaseConfig";
 import { User, onAuthStateChanged } from "firebase/auth";
 import Image from "next/image";
-import Link from "next/link";
 
 export default function DashboardPage() {
   const [user, setUser] = useState<User | null>(null);
@@ -34,13 +33,18 @@ export default function DashboardPage() {
       {user ? (
         <>
           {/* Logo */}
-          <Image src="/assets/images/full-logo.svg" alt="BudGo Logo" width={150} height={50} priority className="mb-4" />
-
+          <Image
+            src="/assets/images/full-logo.svg"
+            alt="BudGo Logo"
+            width={150}
+            height={50}
+            priority
+            className="mb-4"
+          />
           {/* Welcome Message */}
           <h1 className="text-3xl font-bold text-dark mb-4">
             Welcome, {user.displayName || "BudGo User"}!
           </h1>
-
           {/* Buttons */}
           <div className="flex flex-col md:flex-row gap-4 mt-4">
             <button
