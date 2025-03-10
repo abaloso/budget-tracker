@@ -5,6 +5,8 @@ import { auth, db } from "@/app/firebaseConfig";
 import { createUserWithEmailAndPassword, updateProfile, onAuthStateChanged } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 import { Eye, EyeOff } from "lucide-react";
+import Link from "next/link";
+import Image from "next/image";
 
 interface RegisterForm {
   fullName: string;
@@ -20,7 +22,7 @@ export default function RegisterPage() {
   const router = useRouter();
 
   useEffect(() => {
-    // Check if user is already authenticated, then redirect to dashboard
+    // If user is already authenticated, redirect to dashboard
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         console.log("User authenticated, redirecting to dashboard...");
@@ -38,7 +40,7 @@ export default function RegisterPage() {
     setShowPassword((prev) => !prev);
   };
 
-  const handleSubmit = async (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError("");
     setLoading(true);
@@ -46,17 +48,16 @@ export default function RegisterPage() {
       console.log("Starting registration...");
       const userCredential = await createUserWithEmailAndPassword(auth, form.email, form.password);
       console.log("User created:", userCredential.user.uid);
-
       await updateProfile(userCredential.user, { displayName: form.fullName });
       await setDoc(doc(db, "users", userCredential.user.uid), {
         fullName: form.fullName,
         email: form.email,
       });
-
       console.log("User profile updated and data stored.");
-    } catch (err: any) {
+      router.push("/dashboard");
+    } catch (err) {
       console.error("Registration error:", err);
-      setError(err.message);
+      setError((err as Error).message);
     } finally {
       setLoading(false);
     }
@@ -68,9 +69,9 @@ export default function RegisterPage() {
         {/* Left Side: Form */}
         <div className="max-w-lg mx-auto w-full flex flex-col justify-center items-center p-6">
           <div className="text-center mb-7">
-            <a href="/" className="block mb-8">
-              <img className="h-8 mx-auto" src="/assets/images/full-logo.svg" alt="Logo" />
-            </a>
+            <Link href="/">
+              <Image src="/assets/images/full-logo.svg" alt="BudGo Logo" width={200} height={80} priority className="mx-auto mb-6" />
+            </Link>
             <div>
               <h3 className="text-2xl font-semibold text-dark mb-3">Welcome to BudGo</h3>
               <p className="text-base font-medium text-light">
@@ -146,9 +147,9 @@ export default function RegisterPage() {
             </div>
             <p className="text-center text-light">
               Already have an account?{" "}
-              <a href="/login" className="text-dark font-semibold">
+              <Link href="/login" className="text-dark font-semibold">
                 Login
-              </a>
+              </Link>
             </p>
           </form>
         </div>
@@ -156,7 +157,7 @@ export default function RegisterPage() {
         <div className="hidden xl:block">
           <div
             className="w-full h-screen bg-cover bg-center"
-            style={{ backgroundImage: "url(/assets/images/img-3.jpg)" }}
+            style={{ backgroundImage: "url('/assets/images/img-3.jpg')" }}
           ></div>
         </div>
       </div>

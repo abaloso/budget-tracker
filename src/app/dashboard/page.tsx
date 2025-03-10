@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { auth } from "@/app/firebaseConfig";
 import { User, onAuthStateChanged } from "firebase/auth";
+import Image from "next/image";
+import Link from "next/link";
 
 export default function DashboardPage() {
   const [user, setUser] = useState<User | null>(null);
@@ -11,7 +13,6 @@ export default function DashboardPage() {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (authUser) => {
       if (authUser) {
-        console.log("Authenticated user:", authUser);
         setUser(authUser);
       } else {
         router.replace("/login");
@@ -29,21 +30,17 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="h-screen flex flex-col items-center justify-center text-center">
+    <div className="h-screen flex flex-col items-center justify-center text-center p-6">
       {user ? (
         <>
           {/* Logo */}
-          <img
-            src="/assets/images/full-logo.svg"
-            alt="BudGo Logo"
-            className="h-12 mb-4"
-          />
-          
+          <Image src="/assets/images/full-logo.svg" alt="BudGo Logo" width={150} height={50} priority className="mb-4" />
+
           {/* Welcome Message */}
           <h1 className="text-3xl font-bold text-dark mb-4">
             Welcome, {user.displayName || "BudGo User"}!
           </h1>
-          
+
           {/* Buttons */}
           <div className="flex flex-col md:flex-row gap-4 mt-4">
             <button

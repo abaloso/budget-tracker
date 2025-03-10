@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { auth } from "@/app/firebaseConfig";
 import { updatePassword } from "firebase/auth";
 import { Eye, EyeOff } from "lucide-react";
+import Image from "next/image";
 
 export default function ResetPasswordPage() {
   const [newPassword, setNewPassword] = useState<string>("");
@@ -30,8 +31,8 @@ export default function ResetPasswordPage() {
       } else {
         setMessage("No authenticated user found");
       }
-    } catch (err: any) {
-      setMessage("Error updating password: " + err.message);
+    } catch (err) {
+      setMessage("Error updating password: " + (err as Error).message);
     }
   };
 
@@ -42,7 +43,7 @@ export default function ResetPasswordPage() {
         <div className="max-w-lg mx-auto w-full flex flex-col justify-center items-center p-6">
           <div className="text-center mb-7">
             <a href="/" className="block mb-8">
-              <img className="h-8 mx-auto" src="/assets/images/full-logo.svg" alt="Logo" />
+              <Image src="/assets/images/full-logo.svg" alt="Logo" width={150} height={50} priority className="mb-6" />
             </a>
             <div>
               <h3 className="text-2xl font-semibold text-dark mb-3">Change Your Password</h3>
@@ -66,7 +67,11 @@ export default function ResetPasswordPage() {
                   onChange={(e) => setNewPassword(e.target.value)}
                   required
                 />
-                <button type="button" onClick={handleTogglePassword} className="inline-flex items-center justify-center py-2.5 px-4 border border-gray-300 rounded-r-md">
+                <button
+                  type="button"
+                  onClick={handleTogglePassword}
+                  className="inline-flex items-center justify-center py-2.5 px-4 border border-gray-300 rounded-r-md"
+                >
                   {showPassword ? <EyeOff className="h-5 w-5 text-dark" /> : <Eye className="h-5 w-5 text-dark" />}
                 </button>
               </div>
@@ -85,7 +90,11 @@ export default function ResetPasswordPage() {
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   required
                 />
-                <button type="button" onClick={handleTogglePassword} className="inline-flex items-center justify-center py-2.5 px-4 border border-gray-300 rounded-r-md">
+                <button
+                  type="button"
+                  onClick={handleTogglePassword}
+                  className="inline-flex items-center justify-center py-2.5 px-4 border border-gray-300 rounded-r-md"
+                >
                   {showPassword ? <EyeOff className="h-5 w-5 text-dark" /> : <Eye className="h-5 w-5 text-dark" />}
                 </button>
               </div>
@@ -105,7 +114,7 @@ export default function ResetPasswordPage() {
         <div className="hidden xl:block">
           <div
             className="w-full h-screen bg-cover bg-center"
-            style={{ backgroundImage: "url(/assets/images/img-3.jpg)" }}
+            style={{ backgroundImage: "url('/assets/images/img-3.jpg')" }}
           ></div>
         </div>
       </div>
