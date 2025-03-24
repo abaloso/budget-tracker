@@ -1,69 +1,182 @@
-"use client";
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { auth } from "@/app/firebaseConfig";
-import { User, onAuthStateChanged } from "firebase/auth";
-import Image from "next/image";
+"use client"
+import { useEffect, useState } from "react"
+import { auth } from "../firebaseConfig"
+import type { User } from "firebase/auth"
+import { CreditCard, Users, TrendingUp } from "lucide-react"
+import Link from "next/link"
+import Navbar from "@/components/Navbar"
 
 export default function DashboardPage() {
-  const [user, setUser] = useState<User | null>(null);
-  const router = useRouter();
+  const [user, setUser] = useState<User | null>(null)
+  const [recentExpenses, setRecentExpenses] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (authUser) => {
-      if (authUser) {
-        setUser(authUser);
-      } else {
-        router.replace("/login");
-      }
-    });
-    return () => unsubscribe();
-  }, [router]);
+    const currentUser = auth.currentUser
+    if (currentUser) {
+      setUser(currentUser)
+      fetchRecentExpenses(currentUser.uid)
+    }
+    setLoading(false)
+  }, [])
 
-  const handleResetPassword = () => {
-    router.push("/reset-password");
-  };
+  const fetchRecentExpenses = async (userId: string) => {
+    try {
+      // placeholder for expenses
+      setRecentExpenses([])
+    } catch (error) {
+      console.error("Error fetching recent expenses:", error)
+    }
+  }
 
-  const handleLogout = () => {
-    router.push("/logout");
-  };
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600"></div>
+      </div>
+    )
+  }
 
   return (
-    <div className="h-screen flex flex-col items-center justify-center text-center p-6">
-      {user ? (
-        <>
-          {/* Logo */}
-          <Image
-            src="/assets/images/full-logo.svg"
-            alt="BudGo Logo"
-            width={150}
-            height={50}
-            priority
-            className="mb-4"
-          />
-          {/* Welcome Message */}
-          <h1 className="text-3xl font-bold text-dark mb-4">
-            Welcome, {user.displayName || "BudGo User"}!
-          </h1>
-          {/* Buttons */}
-          <div className="flex flex-col md:flex-row gap-4 mt-4">
-            <button
-              onClick={handleResetPassword}
-              className="inline-flex items-center justify-center px-6 py-2.5 bg-blue-700 font-bold text-base text-white rounded-md transition-all duration-500 cursor-pointer active:scale-90"
-            >
-              Reset Password
-            </button>
-            <button
-              onClick={handleLogout}
-              className="inline-flex items-center justify-center px-6 py-2.5 bg-blue-700 font-bold text-base text-white rounded-md transition-all duration-500 cursor-pointer active:scale-90"
-            >
-              Logout
-            </button>
+    <div className="min-h-screen bg-gray-50">
+      <Navbar user={user} />
+
+      <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        <div className="px-4 py-6 sm:px-0">
+          <div className="md:flex md:items-center md:justify-between mb-6">
+            <div className="flex-1 min-w-0">
+              <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate font-lexend">
+                Welcome, {user?.displayName || "BudGo User"}!
+              </h2>
+            </div>
           </div>
-        </>
-      ) : (
-        <h1 className="text-2xl font-bold text-gray-700">Loading...</h1>
-      )}
+
+          {/* Dashboard Cards */}
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {/* Personal Expenses Card */}
+            <div className="bg-white overflow-hidden shadow rounded-lg">
+              <div className="p-5">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0">
+                    <CreditCard className="h-6 w-6 text-blue-600" aria-hidden="true" />
+                  </div>
+                  <div className="ml-5 w-0 flex-1">
+                    <dl>
+                      <dt className="text-sm font-medium text-gray-500 truncate">Personal Expenses</dt>
+                      <dd>
+                        <div className="text-lg font-medium text-gray-900">$0.00</div>
+                      </dd>
+                    </dl>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-gray-50 px-5 py-3">
+                <div className="text-sm">
+                  <Link
+                    href="/dashboard/expenses?type=personal"
+                    className="font-medium text-blue-600 hover:text-blue-700"
+                  >
+                    View all
+                  </Link>
+                </div>
+              </div>
+            </div>
+
+            {/* Group Expenses Card */}
+            <div className="bg-white overflow-hidden shadow rounded-lg">
+              <div className="p-5">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0">
+                    <Users className="h-6 w-6 text-blue-600" aria-hidden="true" />
+                  </div>
+                  <div className="ml-5 w-0 flex-1">
+                    <dl>
+                      <dt className="text-sm font-medium text-gray-500 truncate">Group Expenses</dt>
+                      <dd>
+                        <div className="text-lg font-medium text-gray-900">$0.00</div>
+                      </dd>
+                    </dl>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-gray-50 px-5 py-3">
+                <div className="text-sm">
+                  <Link href="/dashboard/expenses?type=group" className="font-medium text-blue-600 hover:text-blue-700">
+                    View all
+                  </Link>
+                </div>
+              </div>
+            </div>
+
+            {/* Monthly Trend Card */}
+            <div className="bg-white overflow-hidden shadow rounded-lg">
+              <div className="p-5">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0">
+                    <TrendingUp className="h-6 w-6 text-blue-600" aria-hidden="true" />
+                  </div>
+                  <div className="ml-5 w-0 flex-1">
+                    <dl>
+                      <dt className="text-sm font-medium text-gray-500 truncate">Monthly Trend</dt>
+                      <dd>
+                        <div className="text-lg font-medium text-gray-900">--</div>
+                      </dd>
+                    </dl>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-gray-50 px-5 py-3">
+                <div className="text-sm">
+                  <Link href="/dashboard/reports" className="font-medium text-blue-600 hover:text-blue-700">
+                    View reports
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Quick Actions */}
+          <div className="mt-8">
+            <h3 className="text-lg leading-6 font-medium text-gray-900 font-lexend">Quick Actions</h3>
+            <div className="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-2">
+              <div className="bg-white overflow-hidden shadow rounded-lg">
+                <div className="px-4 py-5 sm:p-6">
+                  <h3 className="text-lg leading-6 font-medium text-gray-900 font-lexend">Add Personal Expense</h3>
+                  <div className="mt-2 max-w-xl text-sm text-gray-500">
+                    <p>Track your personal expenses quickly and easily.</p>
+                  </div>
+                  <div className="mt-5">
+                    <Link
+                      href="/dashboard/expenses/create?type=personal"
+                      className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                    >
+                      Add Expense
+                    </Link>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white overflow-hidden shadow rounded-lg">
+                <div className="px-4 py-5 sm:p-6">
+                  <h3 className="text-lg leading-6 font-medium text-gray-900 font-lexend">Add Group Expense</h3>
+                  <div className="mt-2 max-w-xl text-sm text-gray-500">
+                    <p>Split expenses with friends, family, or roommates.</p>
+                  </div>
+                  <div className="mt-5">
+                    <Link
+                      href="/dashboard/expenses/create?type=group"
+                      className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                    >
+                      Add Group Expense
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
     </div>
-  );
+  )
 }
+
