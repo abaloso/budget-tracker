@@ -36,25 +36,25 @@ export default function Navbar({ user }: NavbarProps) {
           <div className="hidden md:ml-6 md:flex md:items-center md:space-x-4">
             <Link
               href="/dashboard"
-              className="px-3 py-2 rounded-md text-sm font-medium text-gray-900 hover:bg-gray-100 hover:underline transition-all"
+              className="px-3 py-2 rounded-md text-sm font-semibold text-gray-900 hover:bg-gray-100 hover:underline transition-all"
             >
               Dashboard
             </Link>
             <Link
               href="/dashboard/expenses"
-              className="px-3 py-2 rounded-md text-sm font-medium text-gray-900 hover:bg-gray-100 hover:underline transition-all"
+              className="px-3 py-2 rounded-md text-sm font-semibold text-gray-900 hover:bg-gray-100 hover:underline transition-all"
             >
               Expenses
             </Link>
             <Link
               href="/dashboard/profile"
-              className="px-3 py-2 rounded-md text-sm font-medium text-gray-900 hover:bg-gray-100 hover:underline transition-all"
+              className="px-3 py-2 rounded-md text-sm font-semibold text-gray-900 hover:bg-gray-100 hover:underline transition-all"
             >
               My Profile
             </Link>
             <Link
               href="/logout"
-              className="px-3 py-2 rounded-md text-sm font-medium text-gray-900 hover:bg-gray-100 hover:underline transition-all"
+              className="px-3 py-2 rounded-md text-sm font-semibold text-gray-900 hover:bg-gray-100 hover:underline transition-all"
             >
               Logout
             </Link>
@@ -80,40 +80,40 @@ export default function Navbar({ user }: NavbarProps) {
         <div className="pt-2 pb-3 space-y-1">
           <Link
             href="/dashboard"
-            className="block px-3 py-2 rounded-md text-base font-medium text-gray-900 hover:bg-gray-100 hover:underline transition-all"
+            className="block px-3 py-2 rounded-md text-base font-semibold text-gray-900 hover:bg-gray-100 hover:underline transition-all text-center"
             onClick={() => setIsOpen(false)}
           >
-            <div className="flex items-center">
+            <div className="flex items-center justify-center">
               <Home className="mr-3 h-5 w-5" />
               Dashboard
             </div>
           </Link>
           <Link
             href="/dashboard/expenses"
-            className="block px-3 py-2 rounded-md text-base font-medium text-gray-900 hover:bg-gray-100 hover:underline transition-all"
+            className="block px-3 py-2 rounded-md text-base font-semibold text-gray-900 hover:bg-gray-100 hover:underline transition-all text-center"
             onClick={() => setIsOpen(false)}
           >
-            <div className="flex items-center">
+            <div className="flex items-center justify-center">
               <CreditCard className="mr-3 h-5 w-5" />
               Expenses
             </div>
           </Link>
           <Link
             href="/dashboard/profile"
-            className="block px-3 py-2 rounded-md text-base font-medium text-gray-900 hover:bg-gray-100 hover:underline transition-all"
+            className="block px-3 py-2 rounded-md text-base font-semibold text-gray-900 hover:bg-gray-100 hover:underline transition-all text-center"
             onClick={() => setIsOpen(false)}
           >
-            <div className="flex items-center">
+            <div className="flex items-center justify-center">
               <User className="mr-3 h-5 w-5" />
               My Profile
             </div>
           </Link>
           <Link
             href="/logout"
-            className="block px-3 py-2 rounded-md text-base font-medium text-gray-900 hover:bg-gray-100 hover:underline transition-all"
+            className="block px-3 py-2 rounded-md text-base font-semibold text-gray-900 hover:bg-gray-100 hover:underline transition-all text-center"
             onClick={() => setIsOpen(false)}
           >
-            <div className="flex items-center">
+            <div className="flex items-center justify-center">
               <LogOut className="mr-3 h-5 w-5" />
               Logout
             </div>
