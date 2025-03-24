@@ -1,1 +1,29 @@
 @import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+@layer base {
+    :root {
+        --font-lexend: "Lexend", sans-serif;
+        --font-roboto: "Roboto", sans-serif;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        font-family: var(--font-lexend);
+    }
+
+    body {
+        font-family: var(--font-roboto);
+    }
+
+    .font-lexend {
+        font-family: var(--font-lexend);
+    }
+}
