@@ -9,7 +9,6 @@ import Navbar from "@/components/Navbar"
 export default function DashboardPage() {
   const [user, setUser] = useState<User | null>(null)
   const [recentExpenses, setRecentExpenses] = useState<any[]>([])
-  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const currentUser = auth.currentUser
@@ -17,24 +16,16 @@ export default function DashboardPage() {
       setUser(currentUser)
       fetchRecentExpenses(currentUser.uid)
     }
-    setLoading(false)
   }, [])
 
   const fetchRecentExpenses = async (userId: string) => {
     try {
-      // placeholder for expenses
+      // This is a placeholder for when we implement the expenses collection
+      // For now, we'll just set an empty array
       setRecentExpenses([])
     } catch (error) {
       console.error("Error fetching recent expenses:", error)
     }
-  }
-
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600"></div>
-      </div>
-    )
   }
 
   return (
@@ -62,9 +53,9 @@ export default function DashboardPage() {
                   </div>
                   <div className="ml-5 w-0 flex-1">
                     <dl>
-                      <dt className="text-sm font-medium text-gray-500 truncate">Personal Expenses</dt>
+                      <dt className="text-sm font-semibold text-gray-500 truncate">Personal Expenses</dt>
                       <dd>
-                        <div className="text-lg font-medium text-gray-900">$0.00</div>
+                        <div className="text-lg font-bold text-gray-900">$0.00</div>
                       </dd>
                     </dl>
                   </div>
@@ -91,9 +82,9 @@ export default function DashboardPage() {
                   </div>
                   <div className="ml-5 w-0 flex-1">
                     <dl>
-                      <dt className="text-sm font-medium text-gray-500 truncate">Group Expenses</dt>
+                      <dt className="text-sm font-semibold text-gray-500 truncate">Group Expenses</dt>
                       <dd>
-                        <div className="text-lg font-medium text-gray-900">$0.00</div>
+                        <div className="text-lg font-bold text-gray-900">$0.00</div>
                       </dd>
                     </dl>
                   </div>
@@ -117,9 +108,9 @@ export default function DashboardPage() {
                   </div>
                   <div className="ml-5 w-0 flex-1">
                     <dl>
-                      <dt className="text-sm font-medium text-gray-500 truncate">Monthly Trend</dt>
+                      <dt className="text-sm font-semibold text-gray-500 truncate">Monthly Trend</dt>
                       <dd>
-                        <div className="text-lg font-medium text-gray-900">--</div>
+                        <div className="text-lg font-bold text-gray-900">--</div>
                       </dd>
                     </dl>
                   </div>
@@ -137,18 +128,18 @@ export default function DashboardPage() {
 
           {/* Quick Actions */}
           <div className="mt-8">
-            <h3 className="text-lg leading-6 font-medium text-gray-900 font-lexend">Quick Actions</h3>
+            <h3 className="text-lg leading-6 font-bold text-gray-900 font-lexend">Quick Actions</h3>
             <div className="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-2">
               <div className="bg-white overflow-hidden shadow rounded-lg">
                 <div className="px-4 py-5 sm:p-6">
-                  <h3 className="text-lg leading-6 font-medium text-gray-900 font-lexend">Add Personal Expense</h3>
+                  <h3 className="text-lg leading-6 font-semibold text-gray-900 font-lexend">Add Personal Expense</h3>
                   <div className="mt-2 max-w-xl text-sm text-gray-500">
                     <p>Track your personal expenses quickly and easily.</p>
                   </div>
                   <div className="mt-5">
                     <Link
                       href="/dashboard/expenses/create?type=personal"
-                      className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                      className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-semibold rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                     >
                       Add Expense
                     </Link>
@@ -158,14 +149,14 @@ export default function DashboardPage() {
 
               <div className="bg-white overflow-hidden shadow rounded-lg">
                 <div className="px-4 py-5 sm:p-6">
-                  <h3 className="text-lg leading-6 font-medium text-gray-900 font-lexend">Add Group Expense</h3>
+                  <h3 className="text-lg leading-6 font-semibold text-gray-900 font-lexend">Add Group Expense</h3>
                   <div className="mt-2 max-w-xl text-sm text-gray-500">
                     <p>Split expenses with friends, family, or roommates.</p>
                   </div>
                   <div className="mt-5">
                     <Link
                       href="/dashboard/expenses/create?type=group"
-                      className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                      className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-semibold rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                     >
                       Add Group Expense
                     </Link>

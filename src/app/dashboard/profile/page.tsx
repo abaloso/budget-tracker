@@ -10,7 +10,6 @@ import Navbar from "@/components/Navbar"
 
 export default function ProfilePage() {
   const [user, setUser] = useState<User | null>(null)
-  const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null)
 
@@ -33,7 +32,6 @@ export default function ProfilePage() {
       })
       fetchUserData(currentUser.uid)
     }
-    setLoading(false)
   }, [])
 
   const fetchUserData = async (userId: string) => {
@@ -107,14 +105,6 @@ export default function ProfilePage() {
     } finally {
       setSaving(false)
     }
-  }
-
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600"></div>
-      </div>
-    )
   }
 
   return (
