@@ -10,6 +10,8 @@ interface NavbarProps {
 }
 
 export default function Navbar({ user }: NavbarProps) {
+  // user prop is required for type checking but not used in this component
+  // will be used in future implementations for conditional rendering
   const [isOpen, setIsOpen] = useState(false)
 
   const toggleMenu = () => {
@@ -36,25 +38,25 @@ export default function Navbar({ user }: NavbarProps) {
           <div className="hidden md:ml-6 md:flex md:items-center md:space-x-4">
             <Link
               href="/dashboard"
-              className="px-3 py-2 rounded-md text-sm font-semibold text-gray-900 hover:bg-gray-100 hover:underline transition-all"
+              className="px-3 py-2 rounded-md text-sm font-medium text-gray-900 hover:bg-gray-100 hover:underline transition-all"
             >
               Dashboard
             </Link>
             <Link
               href="/dashboard/expenses"
-              className="px-3 py-2 rounded-md text-sm font-semibold text-gray-900 hover:bg-gray-100 hover:underline transition-all"
+              className="px-3 py-2 rounded-md text-sm font-medium text-gray-900 hover:bg-gray-100 hover:underline transition-all"
             >
               Expenses
             </Link>
             <Link
               href="/dashboard/profile"
-              className="px-3 py-2 rounded-md text-sm font-semibold text-gray-900 hover:bg-gray-100 hover:underline transition-all"
+              className="px-3 py-2 rounded-md text-sm font-medium text-gray-900 hover:bg-gray-100 hover:underline transition-all"
             >
               My Profile
             </Link>
             <Link
               href="/logout"
-              className="px-3 py-2 rounded-md text-sm font-semibold text-gray-900 hover:bg-gray-100 hover:underline transition-all"
+              className="px-3 py-2 rounded-md text-sm font-medium text-gray-900 hover:bg-gray-100 hover:underline transition-all"
             >
               Logout
             </Link>
@@ -80,40 +82,40 @@ export default function Navbar({ user }: NavbarProps) {
         <div className="pt-2 pb-3 space-y-1">
           <Link
             href="/dashboard"
-            className="block px-3 py-2 rounded-md text-base font-semibold text-gray-900 hover:bg-gray-100 hover:underline transition-all text-center"
+            className="block px-3 py-2 rounded-md text-base font-medium text-gray-900 hover:bg-gray-100 hover:underline transition-all"
             onClick={() => setIsOpen(false)}
           >
-            <div className="flex items-center justify-center">
+            <div className="flex items-center">
               <Home className="mr-3 h-5 w-5" />
               Dashboard
             </div>
           </Link>
           <Link
             href="/dashboard/expenses"
-            className="block px-3 py-2 rounded-md text-base font-semibold text-gray-900 hover:bg-gray-100 hover:underline transition-all text-center"
+            className="block px-3 py-2 rounded-md text-base font-medium text-gray-900 hover:bg-gray-100 hover:underline transition-all"
             onClick={() => setIsOpen(false)}
           >
-            <div className="flex items-center justify-center">
+            <div className="flex items-center">
               <CreditCard className="mr-3 h-5 w-5" />
               Expenses
             </div>
           </Link>
           <Link
             href="/dashboard/profile"
-            className="block px-3 py-2 rounded-md text-base font-semibold text-gray-900 hover:bg-gray-100 hover:underline transition-all text-center"
+            className="block px-3 py-2 rounded-md text-base font-medium text-gray-900 hover:bg-gray-100 hover:underline transition-all"
             onClick={() => setIsOpen(false)}
           >
-            <div className="flex items-center justify-center">
+            <div className="flex items-center">
               <User className="mr-3 h-5 w-5" />
               My Profile
             </div>
           </Link>
           <Link
             href="/logout"
-            className="block px-3 py-2 rounded-md text-base font-semibold text-gray-900 hover:bg-gray-100 hover:underline transition-all text-center"
+            className="block px-3 py-2 rounded-md text-base font-medium text-gray-900 hover:bg-gray-100 hover:underline transition-all"
             onClick={() => setIsOpen(false)}
           >
-            <div className="flex items-center justify-center">
+            <div className="flex items-center">
               <LogOut className="mr-3 h-5 w-5" />
               Logout
             </div>

@@ -8,7 +8,7 @@ import Navbar from "@/components/Navbar"
 
 export default function DashboardPage() {
   const [user, setUser] = useState<User | null>(null)
-  const [recentExpenses, setRecentExpenses] = useState<any[]>([])
+  const [recentExpenses, setRecentExpenses] = useState<Array<{ id: string; title: string; amount: number }>>([])
 
   useEffect(() => {
     const currentUser = auth.currentUser
@@ -18,10 +18,9 @@ export default function DashboardPage() {
     }
   }, [])
 
-  const fetchRecentExpenses = async (userId: string) => {
+  const fetchRecentExpenses = async (_userId: string) => {
     try {
-      // This is a placeholder for when we implement the expenses collection
-      // For now, we'll just set an empty array
+      // placeholder for when we implement the expenses collection
       setRecentExpenses([])
     } catch (error) {
       console.error("Error fetching recent expenses:", error)
@@ -125,6 +124,39 @@ export default function DashboardPage() {
               </div>
             </div>
           </div>
+
+          {/* Recent Expenses */}
+          {recentExpenses.length > 0 && (
+            <div className="mt-8">
+              <h3 className="text-lg leading-6 font-bold text-gray-900 font-lexend">Recent Expenses</h3>
+              <div className="mt-2 overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg">
+                <table className="min-w-full divide-y divide-gray-300">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th scope="col" className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900">
+                        Title
+                      </th>
+                      <th scope="col" className="px-3 py-3.5 text-right text-sm font-semibold text-gray-900">
+                        Amount
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200 bg-white">
+                    {recentExpenses.map((expense) => (
+                      <tr key={expense.id}>
+                        <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900">
+                          {expense.title}
+                        </td>
+                        <td className="whitespace-nowrap px-3 py-4 text-right text-sm text-gray-500">
+                          ${expense.amount.toFixed(2)}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
 
           {/* Quick Actions */}
           <div className="mt-8">

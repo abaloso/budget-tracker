@@ -9,7 +9,7 @@ import Navbar from "@/components/Navbar"
 
 export default function ExpensesPage() {
   const [user, setUser] = useState<User | null>(null)
-  const [expenses, setExpenses] = useState<any[]>([])
+  const [expenses, setExpenses] = useState<Array<{ id: string; title: string; amount: number }>>([])
   const searchParams = useSearchParams()
   const expenseType = searchParams.get("type") || "all"
 
@@ -21,10 +21,8 @@ export default function ExpensesPage() {
     }
   }, [expenseType])
 
-  const fetchExpenses = async (userId: string, type: string) => {
+  const fetchExpenses = async (_userId: string, _type: string) => {
     try {
-      // This is a placeholder for when we implement the expenses collection
-      // For now, we'll just set an empty array
       setExpenses([])
     } catch (error) {
       console.error("Error fetching expenses:", error)
