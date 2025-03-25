@@ -1,41 +1,73 @@
-"use client";
-import { useState, ChangeEvent, FormEvent } from "react";
-import { useRouter } from "next/navigation";
-import { auth } from "@/app/firebaseConfig";
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { Eye, EyeOff } from "lucide-react";
-import Link from "next/link";
-import Image from "next/image";
+"use client"
+import { useState, type ChangeEvent, type FormEvent, useEffect } from "react"
+import { useRouter } from "next/navigation"
+import { auth } from "../firebaseConfig"
+import { signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth"
+import { Eye, EyeOff } from "lucide-react"
+import Link from "next/link"
+import Image from "next/image"
 
 interface LoginForm {
-  email: string;
-  password: string;
+  email: string
+  password: string
 }
 
 export default function LoginPage() {
-  const [form, setForm] = useState<LoginForm>({ email: "", password: "" });
-  const [error, setError] = useState<string>("");
+  const [form, setForm] = useState<LoginForm>({ email: "", password: "" })
+  const [error, setError] = useState<string>("")
+  const [loading, setLoading] = useState<boolean>(false)
+  const [showPassword, setShowPassword] = useState<boolean>(false)
+  const router = useRouter()
 
-  const [showPassword, setShowPassword] = useState<boolean>(false);
-  const router = useRouter();
+  useEffect(() => {
+    // Check if user is already authenticated
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        console.log("User already authenticated, redirecting to dashboard...")
+        router.replace("/dashboard")
+      }
+    })
+
+    return () => unsubscribe()
+  }, [router])
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
+    setForm({ ...form, [e.target.name]: e.target.value })
+  }
 
   const handleTogglePassword = () => {
-    setShowPassword((prev) => !prev);
-  };
+    setShowPassword((prev) => !prev)
+  }
 
   const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
+    e.preventDefault()
+    setError("")
+    setLoading(true)
+
     try {
-      await signInWithEmailAndPassword(auth, form.email, form.password);
-      router.push("/dashboard");
+      console.log("Attempting login with:", form.email)
+
+      if (!auth) {
+        throw new Error("Authentication not initialized. Please check your Firebase configuration.")
+      }
+      await signInWithEmailAndPassword(auth, form.email, form.password)
+      console.log("Login successful, redirecting to dashboard...")
+      router.push("/dashboard")
     } catch (err) {
-      setError((err as Error).message);
+      console.error("Login error:", err)
+
+      const errorMessage = (err as Error).message
+      if (errorMessage.includes("user-not-found") || errorMessage.includes("wrong-password")) {
+        setError("Invalid email or password. Please try again.")
+      } else if (errorMessage.includes("too-many-requests")) {
+        setError("Too many failed login attempts. Please try again later or reset your password.")
+      } else {
+        setError(`Login failed: ${errorMessage}`)
+      }
+    } finally {
+      setLoading(false)
     }
-  };
+  }
 
   return (
     <section className="h-screen w-full">
@@ -43,14 +75,23 @@ export default function LoginPage() {
         <div className="max-w-lg mx-auto w-full flex flex-col justify-center items-center p-6">
           <div className="text-center mb-7">
             <Link href="/">
-              <Image src="/assets/images/full-logo.svg" alt="BudGo Logo" width={200} height={80} priority className="mx-auto mb-6" />
+              <Image
+                src="/assets/images/full-logo.svg"
+                alt="BudGo Logo"
+                width={200}
+                height={80}
+                priority
+                className="mx-auto mb-6"
+              />
             </Link>
             <h3 className="text-2xl font-semibold text-dark mb-3">Welcome to BudGo</h3>
             <p className="text-base font-medium text-light">Welcome back! Sign in to your account.</p>
           </div>
           <form className="w-full" onSubmit={handleSubmit}>
             <div className="mb-4">
-              <label htmlFor="email" className="block text-base font-semibold text-dark mb-2">Email address</label>
+              <label htmlFor="email" className="block text-base font-semibold text-dark mb-2">
+                Email address
+              </label>
               <input
                 id="email"
                 name="email"
@@ -62,7 +103,9 @@ export default function LoginPage() {
               />
             </div>
             <div className="mb-4">
-              <label htmlFor="password" className="block text-base font-semibold text-dark mb-2">Password</label>
+              <label htmlFor="password" className="block text-base font-semibold text-dark mb-2">
+                Password
+              </label>
               <div className="flex">
                 <input
                   id="password"
@@ -86,9 +129,17 @@ export default function LoginPage() {
             <div className="text-center mb-7">
               <button
                 type="submit"
+                disabled={loading}
                 className="w-full inline-flex items-center justify-center px-6 py-2.5 bg-blue-700 font-bold text-base text-white rounded-md transition-all duration-500 cursor-pointer active:scale-90"
               >
-                Log In
+                {loading ? (
+                  <>
+                    <div className="animate-spin mr-2 h-4 w-4 border-t-2 border-b-2 border-white rounded-full"></div>
+                    Logging in...
+                  </>
+                ) : (
+                  "Log In"
+                )}
               </button>
             </div>
             <p className="text-center text-light">
@@ -97,12 +148,21 @@ export default function LoginPage() {
                 Register
               </Link>
             </p>
+            <p className="text-center text-light mt-2">
+              <Link href="/forgot-password" className="text-blue-600 font-semibold">
+                Forgot your password?
+              </Link>
+            </p>
           </form>
         </div>
         <div className="hidden xl:block">
-          <div className="w-full h-screen bg-cover bg-center" style={{ backgroundImage: "url(/assets/images/img-2.jpg)" }}></div>
+          <div
+            className="w-full h-screen bg-cover bg-center"
+            style={{ backgroundImage: "url(/assets/images/img-2.jpg)" }}
+          ></div>
         </div>
       </div>
     </section>
-  );
+  )
 }
+
