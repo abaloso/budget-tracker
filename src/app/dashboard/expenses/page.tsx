@@ -23,6 +23,8 @@ export default function ExpensesPage() {
 
   const fetchExpenses = async (_userId: string, _type: string) => {
     try {
+      // This is a placeholder for when we implement the expenses collection
+      // For now, we'll just set an empty array
       setExpenses([])
     } catch (error) {
       console.error("Error fetching expenses:", error)
