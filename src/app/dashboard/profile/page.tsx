@@ -1,31 +1,22 @@
 "use client"
-import { useState, useEffect, type FormEvent } from "react"
+import { useState, type FormEvent } from "react"
 import type React from "react"
+
 import { useAuth } from "@/context/auth-context"
-import { UserIcon, Mail, Lock, Save } from 'lucide-react'
+import { UserIcon, Mail, Lock, Save } from "lucide-react"
+import { logger } from "@/lib/logger"
 
 export default function ProfilePage() {
-  const { user, userData, updateUserProfile, updateUserEmail, updateUserPassword, loading, error } = useAuth()
+  const { user, updateUserProfile, updateUserEmail, updateUserPassword } = useAuth()
+  const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null)
 
   const [formData, setFormData] = useState({
-    displayName: "",
-    email: "",
+    displayName: user?.displayName || "",
+    email: user?.email || "",
     newPassword: "",
     confirmPassword: "",
   })
-
-  // Initialize form data when user data is available
-  useEffect(() => {
-    if (user && userData) {
-      setFormData({
-        displayName: userData.displayName || "",
-        email: userData.email || "",
-        newPassword: "",
-        confirmPassword: "",
-      })
-    }
-  }, [user, userData])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
@@ -39,23 +30,27 @@ export default function ProfilePage() {
     e.preventDefault()
     if (!user) return
 
+    setSaving(true)
     setMessage(null)
 
     try {
       // Update display name if changed
       if (formData.displayName !== user.displayName) {
         await updateUserProfile({ displayName: formData.displayName })
+        logger.info("Display name updated successfully", { context: "profile" })
       }
 
       // Update email if changed
       if (formData.email !== user.email) {
         await updateUserEmail(formData.email)
+        logger.info("Email updated successfully", { context: "profile" })
       }
 
       // Update password if provided
       if (formData.newPassword) {
         if (formData.newPassword !== formData.confirmPassword) {
           setMessage({ type: "error", text: "Passwords do not match" })
+          setSaving(false)
           return
         }
         await updateUserPassword(formData.newPassword)
@@ -64,25 +59,20 @@ export default function ProfilePage() {
           newPassword: "",
           confirmPassword: "",
         }))
+        logger.info("Password updated successfully", { context: "profile" })
       }
 
       setMessage({ type: "success", text: "Profile updated successfully" })
-    } catch (err) {
-      // Error is already handled by the auth context
-      setMessage({ type: "error", text: error || "An error occurred" })
+    } catch (error) {
+      logger.error("Error updating profile", { context: "profile", data: error })
+      setMessage({ type: "error", text: `Error: ${(error as Error).message}` })
+    } finally {
+      setSaving(false)
     }
   }
 
-  if (!user || !userData) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin h-8 w-8 border-t-2 border-b-2 border-blue-500 rounded-full"></div>
-      </div>
-    )
-  }
-
   return (
-    <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+    <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
       <div className="px-4 py-6 sm:px-0">
         <div className="md:flex md:items-center md:justify-between mb-6">
           <div className="flex-1 min-w-0">
@@ -96,9 +86,7 @@ export default function ProfilePage() {
           <div className="px-4 py-5 sm:p-6">
             {message && (
               <div
-                className={`mb-4 p-4 rounded-md ${
-                  message.type === "success" ? "bg-green-50 text-green-800" : "bg-red-50 text-red-800"
-                }`}
+                className={`mb-4 p-4 rounded-md ${message.type === "success" ? "bg-green-50 text-green-800" : "bg-red-50 text-red-800"}`}
               >
                 {message.text}
               </div>
@@ -189,10 +177,10 @@ export default function ProfilePage() {
                 <div className="flex justify-end">
                   <button
                     type="submit"
-                    disabled={loading}
+                    disabled={saving}
                     className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-semibold rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                   >
-                    {loading ? (
+                    {saving ? (
                       <>
                         <div className="animate-spin mr-2 h-4 w-4 border-t-2 border-b-2 border-white rounded-full"></div>
                         Saving...
@@ -210,6 +198,6 @@ export default function ProfilePage() {
           </div>
         </div>
       </div>
-    </div>
+    </main>
   )
 }
