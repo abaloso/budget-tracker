@@ -1,7 +1,7 @@
 "use client";
 import { useState, FormEvent } from "react";
 import { sendPasswordResetEmail } from "firebase/auth";
-import { auth } from "@/app/firebaseConfig";
+import { auth } from "@/lib/firebase";
 import Link from "next/link";
 import Image from "next/image";
 

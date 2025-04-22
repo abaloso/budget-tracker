@@ -1,9 +1,8 @@
 "use client"
 import { useState, type ChangeEvent, type FormEvent, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { auth } from "../firebaseConfig"
-import { signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth"
-import { Eye, EyeOff } from "lucide-react"
+import { useAuth } from "@/context/auth-context"
+import { Eye, EyeOff } from 'lucide-react'
 import Link from "next/link"
 import Image from "next/image"
 
@@ -14,22 +13,16 @@ interface LoginForm {
 
 export default function LoginPage() {
   const [form, setForm] = useState<LoginForm>({ email: "", password: "" })
-  const [error, setError] = useState<string>("")
-  const [loading, setLoading] = useState<boolean>(false)
   const [showPassword, setShowPassword] = useState<boolean>(false)
   const router = useRouter()
+  const { signIn, loading, error, user } = useAuth()
 
+  // Redirect if already logged in
   useEffect(() => {
-    // Check if user is already authenticated
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        console.log("User already authenticated, redirecting to dashboard...")
-        router.replace("/dashboard")
-      }
-    })
-
-    return () => unsubscribe()
-  }, [router])
+    if (user) {
+      router.replace("/dashboard")
+    }
+  }, [user, router])
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value })
@@ -41,31 +34,13 @@ export default function LoginPage() {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
-    setError("")
-    setLoading(true)
 
     try {
-      console.log("Attempting login with:", form.email)
-
-      if (!auth) {
-        throw new Error("Authentication not initialized. Please check your Firebase configuration.")
-      }
-      await signInWithEmailAndPassword(auth, form.email, form.password)
-      console.log("Login successful, redirecting to dashboard...")
+      await signIn(form.email, form.password)
       router.push("/dashboard")
     } catch (err) {
-      console.error("Login error:", err)
-
-      const errorMessage = (err as Error).message
-      if (errorMessage.includes("user-not-found") || errorMessage.includes("wrong-password")) {
-        setError("Invalid email or password. Please try again.")
-      } else if (errorMessage.includes("too-many-requests")) {
-        setError("Too many failed login attempts. Please try again later or reset your password.")
-      } else {
-        setError(`Login failed: ${errorMessage}`)
-      }
-    } finally {
-      setLoading(false)
+      // Error is already handled by the auth context
+      console.error("Login failed:", err)
     }
   }
 
@@ -165,4 +140,3 @@ export default function LoginPage() {
     </section>
   )
 }
-

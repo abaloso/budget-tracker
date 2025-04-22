@@ -1,7 +1,7 @@
 "use client";
 import { useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import { auth } from "@/app/firebaseConfig";
+import { auth } from "@/lib/firebase";
 import { updatePassword } from "firebase/auth";
 import { Eye, EyeOff } from "lucide-react";
 import Link from "next/link";

@@ -1,10 +1,8 @@
 "use client"
 import { useState, type ChangeEvent, type FormEvent, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { auth, db } from "../firebaseConfig"
-import { createUserWithEmailAndPassword, updateProfile, onAuthStateChanged } from "firebase/auth"
-import { doc, setDoc } from "firebase/firestore"
-import { Eye, EyeOff } from "lucide-react"
+import { useAuth } from "@/context/auth-context"
+import { Eye, EyeOff } from 'lucide-react'
 import Link from "next/link"
 import Image from "next/image"
 
@@ -16,21 +14,16 @@ interface RegisterForm {
 
 export default function RegisterPage() {
   const [form, setForm] = useState<RegisterForm>({ fullName: "", email: "", password: "" })
-  const [error, setError] = useState<string>("")
-  const [loading, setLoading] = useState<boolean>(false)
   const [showPassword, setShowPassword] = useState<boolean>(false)
   const router = useRouter()
+  const { signUp, loading, error, user } = useAuth()
 
+  // Redirect if already logged in
   useEffect(() => {
-    // If user is already authenticated, redirect to dashboard
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        console.log("User authenticated, redirecting to dashboard...")
-        router.replace("/dashboard")
-      }
-    })
-    return () => unsubscribe()
-  }, [router])
+    if (user) {
+      router.replace("/dashboard")
+    }
+  }, [user, router])
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }))
@@ -42,45 +35,18 @@ export default function RegisterPage() {
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    setError("")
-    setLoading(true)
-
+    
     try {
-      console.log("Starting registration...")
-
-      // Check if auth and db are initialized
-      if (!auth || !db) {
-        throw new Error("Authentication or database not initialized. Please check your Firebase configuration.")
-      }
-
-      const userCredential = await createUserWithEmailAndPassword(auth, form.email, form.password)
-      console.log("User created:", userCredential.user.uid)
-
-      await updateProfile(userCredential.user, { displayName: form.fullName })
-
-      await setDoc(doc(db, "users", userCredential.user.uid), {
-        fullName: form.fullName,
-        email: form.email,
-        createdAt: new Date().toISOString(),
-      })
-
-      console.log("User profile updated and data stored.")
+      // Trim whitespace from inputs
+      const email = form.email.trim()
+      const fullName = form.fullName.trim()
+      const password = form.password
+      
+      await signUp(email, password, fullName)
       router.push("/dashboard")
     } catch (err) {
-      console.error("Registration error:", err)
-
-      const errorMessage = (err as Error).message
-      if (errorMessage.includes("email-already-in-use")) {
-        setError("This email is already registered. Please use a different email or try logging in.")
-      } else if (errorMessage.includes("weak-password")) {
-        setError("Password is too weak. Please use a stronger password.")
-      } else if (errorMessage.includes("invalid-email")) {
-        setError("Invalid email address. Please check and try again.")
-      } else {
-        setError(`Registration failed: ${errorMessage}`)
-      }
-    } finally {
-      setLoading(false)
+      // Error is already handled by the auth context
+      console.error("Registration failed:", err)
     }
   }
 
@@ -193,4 +159,3 @@ export default function RegisterPage() {
     </section>
   )
 }
-

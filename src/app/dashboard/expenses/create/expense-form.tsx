@@ -3,12 +3,11 @@ import { useState, type FormEvent, useEffect } from "react"
 import type React from "react"
 
 import { useRouter, useSearchParams } from "next/navigation"
-import { auth, db } from "../../../firebaseConfig"
+import { auth, db } from "../../../../lib/firebase"
 import type { User } from "firebase/auth"
 import { collection, addDoc, serverTimestamp } from "firebase/firestore"
 import { Calendar, DollarSign, Tag, FileText } from "lucide-react"
 import Link from "next/link"
-import Navbar from "@/components/Navbar"
 
 export default function ExpenseForm() {
   const router = useRouter()
@@ -89,8 +88,6 @@ export default function ExpenseForm() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navbar user={user} />
-
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <div className="px-4 py-6 sm:px-0">
           <div className="md:flex md:items-center md:justify-between mb-6">

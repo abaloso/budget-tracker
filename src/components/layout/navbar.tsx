@@ -1,7 +1,7 @@
 "use client"
 import { useState } from "react"
-import Link from "next/link"
 import Image from "next/image"
+import { NavLink } from "@/components/ui/nav-link"
 import { Menu, X, Home, CreditCard, User, LogOut } from "lucide-react"
 import type { User as FirebaseUser } from "firebase/auth"
 
@@ -9,9 +9,15 @@ interface NavbarProps {
   user: FirebaseUser | null
 }
 
+// Navigation items - single source of truth
+const navItems = [
+  { href: "/dashboard", label: "Dashboard", icon: <Home className="h-5 w-5" />, exact: true },
+  { href: "/dashboard/expenses", label: "Expenses", icon: <CreditCard className="h-5 w-5" /> },
+  { href: "/dashboard/profile", label: "My Profile", icon: <User className="h-5 w-5" /> },
+  { href: "/logout", label: "Logout", icon: <LogOut className="h-5 w-5" /> },
+]
+
 export default function Navbar({ user }: NavbarProps) {
-  // user prop is required for type checking but not used in this component
-  // will be used in future implementations for conditional rendering
   const [isOpen, setIsOpen] = useState(false)
 
   const toggleMenu = () => {
@@ -24,7 +30,7 @@ export default function Navbar({ user }: NavbarProps) {
         <div className="flex justify-between h-16">
           <div className="flex">
             <div className="flex-shrink-0 flex items-center">
-              <Link href="/dashboard">
+              <NavLink href="/dashboard">
                 <Image
                   src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/full-logo-Di5zi0JUFhgLuagoi8OBlsmAOVRdg5.svg"
                   alt="BudGo Logo"
@@ -32,34 +38,34 @@ export default function Navbar({ user }: NavbarProps) {
                   height={40}
                   priority
                 />
-              </Link>
+              </NavLink>
             </div>
           </div>
           <div className="hidden md:ml-6 md:flex md:items-center md:space-x-4">
-            <Link
+            <NavLink
               href="/dashboard"
               className="px-3 py-2 rounded-md text-sm font-medium text-gray-900 hover:bg-gray-100 hover:underline transition-all"
             >
               Dashboard
-            </Link>
-            <Link
+            </NavLink>
+            <NavLink
               href="/dashboard/expenses"
               className="px-3 py-2 rounded-md text-sm font-medium text-gray-900 hover:bg-gray-100 hover:underline transition-all"
             >
               Expenses
-            </Link>
-            <Link
+            </NavLink>
+            <NavLink
               href="/dashboard/profile"
               className="px-3 py-2 rounded-md text-sm font-medium text-gray-900 hover:bg-gray-100 hover:underline transition-all"
             >
               My Profile
-            </Link>
-            <Link
+            </NavLink>
+            <NavLink
               href="/logout"
               className="px-3 py-2 rounded-md text-sm font-medium text-gray-900 hover:bg-gray-100 hover:underline transition-all"
             >
               Logout
-            </Link>
+            </NavLink>
           </div>
           <div className="-mr-2 flex items-center md:hidden">
             <button
@@ -80,7 +86,7 @@ export default function Navbar({ user }: NavbarProps) {
       {/* Mobile menu */}
       <div className={`${isOpen ? "block" : "hidden"} md:hidden`}>
         <div className="pt-2 pb-3 space-y-1">
-          <Link
+          <NavLink
             href="/dashboard"
             className="block px-3 py-2 rounded-md text-base font-medium text-gray-900 hover:bg-gray-100 hover:underline transition-all"
             onClick={() => setIsOpen(false)}
@@ -89,8 +95,8 @@ export default function Navbar({ user }: NavbarProps) {
               <Home className="mr-3 h-5 w-5" />
               Dashboard
             </div>
-          </Link>
-          <Link
+          </NavLink>
+          <NavLink
             href="/dashboard/expenses"
             className="block px-3 py-2 rounded-md text-base font-medium text-gray-900 hover:bg-gray-100 hover:underline transition-all"
             onClick={() => setIsOpen(false)}
@@ -99,8 +105,8 @@ export default function Navbar({ user }: NavbarProps) {
               <CreditCard className="mr-3 h-5 w-5" />
               Expenses
             </div>
-          </Link>
-          <Link
+          </NavLink>
+          <NavLink
             href="/dashboard/profile"
             className="block px-3 py-2 rounded-md text-base font-medium text-gray-900 hover:bg-gray-100 hover:underline transition-all"
             onClick={() => setIsOpen(false)}
@@ -109,8 +115,8 @@ export default function Navbar({ user }: NavbarProps) {
               <User className="mr-3 h-5 w-5" />
               My Profile
             </div>
-          </Link>
-          <Link
+          </NavLink>
+          <NavLink
             href="/logout"
             className="block px-3 py-2 rounded-md text-base font-medium text-gray-900 hover:bg-gray-100 hover:underline transition-all"
             onClick={() => setIsOpen(false)}
@@ -119,10 +125,9 @@ export default function Navbar({ user }: NavbarProps) {
               <LogOut className="mr-3 h-5 w-5" />
               Logout
             </div>
-          </Link>
+          </NavLink>
         </div>
       </div>
     </header>
   )
 }
-
