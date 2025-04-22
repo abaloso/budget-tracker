@@ -11,20 +11,23 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
   const router = useRouter()
 
   useEffect(() => {
+    // If not loading and no user, redirect to login
     if (!loading && !user) {
       router.push("/login")
     }
   }, [user, loading, router])
 
+  // Show loading state while checking authentication
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <Loading />
+        <Loading size="lg" text="Loading your dashboard..." />
       </div>
     )
   }
 
-   if (!user && !loading) {
+  // If no user and not loading, don't render anything (will redirect)
+  if (!user && !loading) {
     return null
   }
 

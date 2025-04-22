@@ -75,41 +75,49 @@ export default function ExpenseForm() {
         throw new Error("Please enter a valid amount")
       }
 
-      // Add expense to Firestore
-      await addDoc(collection(db, "expenses"), {
-        userId: user.uid,
-        title: form.title,
-        amount,
-        category: form.category,
-        date: form.date,
-        description: form.description,
-        type: form.type,
-        createdAt: serverTimestamp(),
-      })
+      // Add expense to Firestore with error handling
+      try {
+        const docRef = await addDoc(collection(db, "expenses"), {
+          userId: user.uid,
+          title: form.title,
+          amount,
+          category: form.category,
+          date: form.date,
+          description: form.description,
+          type: form.type,
+          createdAt: serverTimestamp(),
+        })
 
-      logger.info("Expense added successfully", { context: "expense-form" })
+        logger.info("Expense added successfully", { context: "expense-form", data: { id: docRef.id } })
 
-      // Show success message
-      setSuccess(true)
+        // Show success message
+        setSuccess(true)
 
-      // Reset form
-      setForm({
-        title: "",
-        amount: "",
-        category: "",
-        date: new Date().toISOString().split("T")[0],
-        description: "",
-        type: form.type,
-      })
+        // Reset form
+        setForm({
+          title: "",
+          amount: "",
+          category: form.category, // Keep the category for convenience
+          date: new Date().toISOString().split("T")[0],
+          description: "",
+          type: form.type, // Keep the type for convenience
+        })
 
-      // Redirect after a short delay
-      setTimeout(() => {
-        router.push(`/dashboard/expenses?type=${form.type}`)
-      }, 1500)
+        // Set submitting to false before redirect
+        setSubmitting(false)
+
+        // Redirect after a short delay
+        setTimeout(() => {
+          router.push(`/dashboard/expenses?type=${form.type}`)
+        }, 2000)
+      } catch (firestoreError) {
+        // Specific error handling for Firestore
+        logger.error("Firestore error adding expense", { context: "expense-form", data: firestoreError })
+        throw new Error(`Failed to save expense: ${(firestoreError as Error).message}`)
+      }
     } catch (error) {
       logger.error("Error adding expense", { context: "expense-form", data: error })
       setError((error as Error).message)
-    } finally {
       setSubmitting(false)
     }
   }
@@ -134,8 +142,21 @@ export default function ExpenseForm() {
           <div className="px-4 py-5 sm:p-6">
             {error && <div className="mb-4 p-4 rounded-md bg-red-50 text-red-800">{error}</div>}
             {success && (
-              <div className="mb-4 p-4 rounded-md bg-green-50 text-green-800">
-                Expense added successfully! Redirecting...
+              <div className="mb-4 p-4 rounded-md bg-green-50 text-green-800 border border-green-200">
+                <div className="flex">
+                  <div className="flex-shrink-0">
+                    <svg className="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
+                      <path
+                        fillRule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </div>
+                  <div className="ml-3">
+                    <p className="text-sm font-medium text-green-800">Expense added successfully! Redirecting...</p>
+                  </div>
+                </div>
               </div>
             )}
 

@@ -3,7 +3,7 @@ import { useEffect, useState } from "react"
 import { useSearchParams } from "next/navigation"
 import { useAuth } from "@/context/auth-context"
 import { db } from "@/lib/firebase"
-import { collection, query, where, orderBy, getDocs } from "firebase/firestore"
+import { collection, query, where, orderBy, getDocs, deleteDoc, doc } from "firebase/firestore"
 import { CreditCard, Users, Plus } from "lucide-react"
 import Link from "next/link"
 import { logger } from "@/lib/logger"
@@ -38,19 +38,19 @@ export default function ExpensesContent() {
   const fetchExpenses = async (userId: string, type: string) => {
     try {
       setLoading(true)
+      logger.info("Fetching expenses", { context: "expenses", data: { type } })
 
-      // Build query
-      let expensesQuery = query(collection(db, "expenses"), where("userId", "==", userId), orderBy("createdAt", "desc"))
+      // Build base query
+      const baseQuery = collection(db, "expenses")
+      const constraints = [where("userId", "==", userId)]
 
       // Add type filter if not "all"
       if (type !== "all") {
-        expensesQuery = query(
-          collection(db, "expenses"),
-          where("userId", "==", userId),
-          where("type", "==", type),
-          orderBy("createdAt", "desc"),
-        )
+        constraints.push(where("type", "==", type))
       }
+
+      // Create the query with constraints
+      const expensesQuery = query(baseQuery, ...constraints, orderBy("date", "desc"))
 
       // Execute query
       const querySnapshot = await getDocs(expensesQuery)
@@ -74,11 +74,31 @@ export default function ExpensesContent() {
       }
 
       setExpenses(results)
-      logger.info("Expenses fetched successfully", { context: "expenses", data: { count: results.length } })
+      logger.info("Expenses fetched successfully", {
+        context: "expenses",
+        data: { count: results.length },
+      })
     } catch (error) {
       logger.error("Error fetching expenses", { context: "expenses", data: error })
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleDeleteExpense = async (expenseId: string) => {
+    if (!confirm("Are you sure you want to delete this expense?")) {
+      return
+    }
+
+    try {
+      await deleteDoc(doc(db, "expenses", expenseId))
+      // Refresh the expenses list
+      if (user) {
+        fetchExpenses(user.uid, expenseType)
+      }
+      logger.info("Expense deleted successfully", { context: "expenses", data: { id: expenseId } })
+    } catch (error) {
+      logger.error("Error deleting expense", { context: "expenses", data: error })
     }
   }
 
@@ -216,42 +236,44 @@ export default function ExpensesContent() {
             <ul className="divide-y divide-gray-200">
               {expenses.map((expense) => (
                 <li key={expense.id}>
-                  <div className="px-4 py-4 sm:px-6">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center">
-                        <div
-                          className={`mr-3 flex-shrink-0 h-6 w-6 rounded-full ${expense.type === "personal" ? "bg-blue-100" : "bg-green-100"} flex items-center justify-center`}
-                        >
-                          {expense.type === "personal" ? (
-                            <CreditCard className="h-4 w-4 text-blue-600" />
-                          ) : (
-                            <Users className="h-4 w-4 text-green-600" />
-                          )}
+                  <Link href={`/dashboard/expenses/${expense.id}`} className="block hover:bg-gray-50">
+                    <div className="px-4 py-4 sm:px-6">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center">
+                          <div
+                            className={`mr-3 flex-shrink-0 h-6 w-6 rounded-full ${expense.type === "personal" ? "bg-blue-100" : "bg-green-100"} flex items-center justify-center`}
+                          >
+                            {expense.type === "personal" ? (
+                              <CreditCard className="h-4 w-4 text-blue-600" />
+                            ) : (
+                              <Users className="h-4 w-4 text-green-600" />
+                            )}
+                          </div>
+                          <p className="text-sm font-medium text-blue-600 truncate">{expense.title}</p>
                         </div>
-                        <p className="text-sm font-medium text-blue-600 truncate">{expense.title}</p>
+                        <div className="ml-2 flex-shrink-0 flex">
+                          <p className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                            {formatCurrency(expense.amount)}
+                          </p>
+                        </div>
                       </div>
-                      <div className="ml-2 flex-shrink-0 flex">
-                        <p className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                          {formatCurrency(expense.amount)}
-                        </p>
+                      <div className="mt-2 sm:flex sm:justify-between">
+                        <div className="sm:flex">
+                          <p className="flex items-center text-sm text-gray-500">
+                            <span className="truncate">{expense.category}</span>
+                          </p>
+                        </div>
+                        <div className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0">
+                          <p>{new Date(expense.date).toLocaleDateString()}</p>
+                        </div>
                       </div>
+                      {expense.description && (
+                        <div className="mt-2">
+                          <p className="text-sm text-gray-500 line-clamp-2">{expense.description}</p>
+                        </div>
+                      )}
                     </div>
-                    <div className="mt-2 sm:flex sm:justify-between">
-                      <div className="sm:flex">
-                        <p className="flex items-center text-sm text-gray-500">
-                          <span className="truncate">{expense.category}</span>
-                        </p>
-                      </div>
-                      <div className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0">
-                        <p>{new Date(expense.date).toLocaleDateString()}</p>
-                      </div>
-                    </div>
-                    {expense.description && (
-                      <div className="mt-2">
-                        <p className="text-sm text-gray-500 line-clamp-2">{expense.description}</p>
-                      </div>
-                    )}
-                  </div>
+                  </Link>
                 </li>
               ))}
             </ul>

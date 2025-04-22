@@ -7,6 +7,7 @@ import { CreditCard, Users, TrendingUp, Plus } from "lucide-react"
 import Link from "next/link"
 import { logger } from "@/lib/logger"
 
+// Define expense type
 interface Expense {
   id: string
   title: string
@@ -36,8 +37,18 @@ export default function DashboardPage() {
   const fetchDashboardData = async (userId: string) => {
     try {
       setLoading(true)
+      logger.info("Fetching dashboard data", { context: "dashboard" })
 
-      // Fetch recent expenses
+      // Get the current date
+      const today = new Date()
+      const currentMonth = today.getMonth()
+      const currentYear = today.getFullYear()
+
+      // Calculate first day of current and previous month
+      const firstDayCurrentMonth = new Date(currentYear, currentMonth, 1)
+      const firstDayPreviousMonth = new Date(currentYear, currentMonth - 1, 1)
+
+      // Fetch all expenses for the current user
       const expensesQuery = query(
         collection(db, "expenses"),
         where("userId", "==", userId),
@@ -56,19 +67,39 @@ export default function DashboardPage() {
       // Calculate summary data
       let personalTotal = 0
       let groupTotal = 0
+      let currentMonthTotal = 0
+      let previousMonthTotal = 0
 
-      expensesSnapshot.docs.forEach((doc) => {
+      // Get all expenses for monthly calculations
+      const allExpensesQuery = query(collection(db, "expenses"), where("userId", "==", userId))
+
+      const allExpensesSnapshot = await getDocs(allExpensesQuery)
+
+      allExpensesSnapshot.docs.forEach((doc) => {
         const data = doc.data()
+
+        // Calculate personal and group totals
         if (data.type === "personal") {
           personalTotal += data.amount
         } else if (data.type === "group") {
           groupTotal += data.amount
         }
+
+        // Calculate monthly totals for trend
+        const expenseDate = new Date(data.date)
+
+        if (expenseDate >= firstDayCurrentMonth) {
+          currentMonthTotal += data.amount
+        } else if (expenseDate >= firstDayPreviousMonth && expenseDate < firstDayCurrentMonth) {
+          previousMonthTotal += data.amount
+        }
       })
 
-      // For monthly change, you would need to compare with previous month
-      // This is a simplified version
-      const monthlyChange = 0 // Replace with actual calculation
+      // Calculate monthly change percentage
+      let monthlyChange = 0
+      if (previousMonthTotal > 0) {
+        monthlyChange = Math.round(((currentMonthTotal - previousMonthTotal) / previousMonthTotal) * 100)
+      }
 
       setSummaryData({
         personalTotal,
@@ -76,7 +107,15 @@ export default function DashboardPage() {
         monthlyChange,
       })
 
-      logger.info("Dashboard data fetched successfully", { context: "dashboard" })
+      logger.info("Dashboard data fetched successfully", {
+        context: "dashboard",
+        data: {
+          expenseCount: expensesData.length,
+          personalTotal,
+          groupTotal,
+          monthlyChange,
+        },
+      })
     } catch (error) {
       logger.error("Error fetching dashboard data", { context: "dashboard", data: error })
     } finally {

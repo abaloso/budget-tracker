@@ -1,13 +1,12 @@
 "use client"
 import { useState, type FormEvent } from "react"
-import type React from "react"
-
+import React from "react"
 import { useAuth } from "@/context/auth-context"
 import { UserIcon, Mail, Lock, Save } from "lucide-react"
 import { logger } from "@/lib/logger"
 
 export default function ProfilePage() {
-  const { user, updateUserProfile, updateUserEmail, updateUserPassword } = useAuth()
+  const { user, userData, updateUserProfile, updateUserEmail, updateUserPassword, loading: authLoading } = useAuth()
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null)
 
@@ -17,6 +16,17 @@ export default function ProfilePage() {
     newPassword: "",
     confirmPassword: "",
   })
+
+  // Update form data when user data changes
+  React.useEffect(() => {
+    if (user) {
+      setFormData((prev) => ({
+        ...prev,
+        displayName: user.displayName || "",
+        email: user.email || "",
+      }))
+    }
+  }, [user])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
@@ -37,13 +47,13 @@ export default function ProfilePage() {
       // Update display name if changed
       if (formData.displayName !== user.displayName) {
         await updateUserProfile({ displayName: formData.displayName })
-        logger.info("Display name updated successfully", { context: "profile" })
+        logger.info("Display name updated", { context: "profile" })
       }
 
       // Update email if changed
       if (formData.email !== user.email) {
         await updateUserEmail(formData.email)
-        logger.info("Email updated successfully", { context: "profile" })
+        logger.info("Email updated", { context: "profile" })
       }
 
       // Update password if provided
@@ -59,7 +69,7 @@ export default function ProfilePage() {
           newPassword: "",
           confirmPassword: "",
         }))
-        logger.info("Password updated successfully", { context: "profile" })
+        logger.info("Password updated", { context: "profile" })
       }
 
       setMessage({ type: "success", text: "Profile updated successfully" })
@@ -69,6 +79,18 @@ export default function ProfilePage() {
     } finally {
       setSaving(false)
     }
+  }
+
+  if (authLoading) {
+    return (
+      <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        <div className="px-4 py-6 sm:px-0">
+          <div className="flex justify-center items-center h-64">
+            <div className="animate-spin h-8 w-8 border-t-2 border-b-2 border-blue-500 rounded-full"></div>
+          </div>
+        </div>
+      </main>
+    )
   }
 
   return (
